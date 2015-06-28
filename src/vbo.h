@@ -10,6 +10,7 @@ extern int xRange;
 extern int yRange;
 extern int zRange;
 extern int timer;
+extern bool overdose;
 
 class vbo{
 public:
@@ -23,12 +24,15 @@ public:
     
     int ID;
     static int sum;
+    int x,y;
     
     static const int WIDTH = 512;
     static const int HEIGHT = 512;
     static const int NUM_PARTICLES = WIDTH * HEIGHT;
 
     unsigned char * pixels;
+    
+        float vecLength[NUM_PARTICLES];
     
     ofImage image;
     
@@ -37,8 +41,8 @@ public:
     ofFloatColor myColor[NUM_PARTICLES];
     
     ofVec3f vec[NUM_PARTICLES];
-    float vecLength[NUM_PARTICLES];
-    bool overdose;
+
+
     
 };
 #endif

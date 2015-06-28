@@ -8,6 +8,7 @@ int yRange;
 int zRange;
 bool xFlag, yFlag, zFlag;
 int timer;
+bool overdose;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -24,20 +25,19 @@ void ofApp::setup(){
     
     
     // nodes
-//    testNodes[0].setPosition(ofVec3f(0,0,0));
-//    testNodes[1].setPosition(ofVec3f(1000,0,1200));
+    testNodes[0].setPosition(ofVec3f(0,0,0));
+    testNodes[1].setPosition(ofVec3f(1000,0,1200));
     testNodes[1].setParent(testNodes[0]);
     
     
     // cameras
     camToView = 0;
-    cam[0].setPosition(posX_00, posY_00, posZ_00);
-    cam[1].setPosition(posX_01, posY_01, posZ_01);
+    cam[0].setPosition(300, -40, -800);
+    cam[1].setPosition(-100, 200, -500);
 //    lookatIndex[1] = kNumTestNodes-1;
     for (int t=0; t<kNumCameras; t++) {
         cam[t].clearParent();
     }
-
     
     
     //  lights
@@ -69,31 +69,22 @@ void ofApp::update(){
     ofEnableAlphaBlending();
     float freqMult = 1;
     float amp = 15;
-//    float scale = 1;
     
-    testNodes[0].setPosition(ofVec3f(0,0,0));
-    testNodes[1].setPosition(ofVec3f(1000,0,1200));
     for(int i=0; i<kNumTestNodes; i++) {
-        
-        
-        testNodes[i].setOrientation(ofVec3f(sin(ofGetElapsedTimef() * freqMult * 0.2) * amp * 5, cos(ofGetElapsedTimef() * freqMult * 0.2) * amp * 5, sin(ofGetElapsedTimef() * freqMult * 0.2 * 0.7) * amp * 5));
-//        testNodes[i].setScale(1);
-//        testNodes[i].draw();
-        
+        testNodes[i].setOrientation(ofVec3f(sin(ofGetElapsedTimef() * freqMult * 0.2) * amp * 5,
+                                            cos(ofGetElapsedTimef() * freqMult * 0.2) * amp * 5,
+                                            sin(ofGetElapsedTimef() * freqMult * 0.2 * 0.7) * amp * 5));
         freqMult *= 3;
         amp *= 0.8;
-//        scale *= 0.8;
     }
-//    cout << cam[0].getGlobalPosition() << "\n";
     
     
     //  cameras
-    /*
+    
     if (xFlag == false) {
-        posX_00 -= xAxis;
-        posX_01 -= xAxis;
-        if (cam[0].getX() < -1000 || cam[1].getX() < -1000) {
+        if (cam[0].getGlobalPosition().x < -700 || cam[1].getGlobalPosition().x < -700) {
             xFlag = true;
+            overdose = true;
             switch (camToView) {
                 case 0:
                     camToView = 1;
@@ -104,10 +95,9 @@ void ofApp::update(){
             }
         }
     }else if (xFlag == true) {
-        posX_00 += xAxis;
-        posX_01 += xAxis;
-        if (cam[0].getX() > 1000 || cam[1].getX() > 1000) {
+        if (cam[0].getGlobalPosition().x > 700 || cam[1].getGlobalPosition().x > 700) {
             xFlag = false;
+            overdose = true;
             switch (camToView) {
                 case 0:
                     camToView = 1;
@@ -121,10 +111,9 @@ void ofApp::update(){
     
     
     if (yFlag == false) {
-        posY_00 -= yAxis;
-        posY_01 -= yAxis;
-        if (cam[0].getY() < -100 || cam[1].getY() < -100) {
+        if (cam[0].getGlobalPosition().y < -200 || cam[1].getGlobalPosition().y < -200) {
             yFlag = true;
+            overdose = true;
             switch (camToView) {
                 case 0:
                     camToView = 1;
@@ -135,10 +124,9 @@ void ofApp::update(){
             }
         }
     }else if (yFlag == true) {
-        posY_00 += yAxis;
-        posY_01 += yAxis;
-        if (cam[0].getY() > 1000 || cam[1].getY() > 1000) {
+        if (cam[0].getGlobalPosition().y > 200 || cam[1].getGlobalPosition().y > 200) {
             yFlag = false;
+            overdose = true;
             switch (camToView) {
                 case 0:
                     camToView = 1;
@@ -152,10 +140,9 @@ void ofApp::update(){
     
     
     if (zFlag == false) {
-        posZ_00 -= zAxis;
-        posZ_01 -= zAxis;
-        if (cam[0].getZ() < -1000 || cam[1].getZ() < -1000) {
+        if (cam[0].getGlobalPosition().z < -700 || cam[1].getGlobalPosition().z < -700) {
             zFlag = true;
+            overdose = true;
             switch (camToView) {
                 case 0:
                     camToView = 1;
@@ -166,10 +153,9 @@ void ofApp::update(){
             }
         }
     }else if (zFlag == true) {
-        posZ_00 += zAxis;
-        posZ_01 += zAxis;
-        if (cam[0].getZ() > 1000 || cam[1].getZ() > 1000) {
+        if (cam[0].getGlobalPosition().z > 700 || cam[1].getGlobalPosition().z > 700) {
             zFlag = false;
+            overdose = true;            
             switch (camToView) {
                 case 0:
                     camToView = 1;
@@ -183,7 +169,8 @@ void ofApp::update(){
     
     
     if (camToView == 0) {
-        if (cam[0].getX() == -100 || cam[0].getX() == 100){
+        if (((int)cam[0].getGlobalPosition().x > -110 && (int)cam[0].getGlobalPosition().x < -90) ||
+            ((int)cam[0].getGlobalPosition().x > 90  && (int)cam[0].getGlobalPosition().x < 110)){
             clearBuffer = true;
             if (clearBuffer) {
                 bufferClearTime = 50;
@@ -191,17 +178,16 @@ void ofApp::update(){
         }
         
     }else if (camToView == 1) {
-        if (cam[1].getX() == -100 || cam[1].getX() == 100){
+        if (((int)cam[1].getGlobalPosition().x > -110 && (int)cam[1].getGlobalPosition().x < -90) ||
+            ((int)cam[1].getGlobalPosition().x > 90  && (int)cam[1].getGlobalPosition().x < 110)){
             clearBuffer = true;
             if (clearBuffer) {
                 bufferClearTime = 30;
             }
         }
     }
-    */
     
-//    cam[0].setPosition(posX_00, posY_00, posZ_00);
-//    cam[1].setPosition(posX_01, posY_01, posZ_01);
+
     for (int t=0; t<kNumCameras; t++) {
         ofVec3f oldP = cam[t].getGlobalPosition();
         ofQuaternion oldQ = cam[t].getGlobalOrientation();
@@ -260,7 +246,6 @@ void ofApp::update(){
     //  objects
     for (int s=0; s<num; s++) {
         v[s].update();
-        testNodes[s].setPosition(v[s].myVerts[0]);
     }
     
     
@@ -269,12 +254,7 @@ void ofApp::update(){
         points.push_back(ofVec3f(ofRandom(-2000, 2000),ofRandom(-10, 200),ofRandom(-2000, 2000)));
         speeds.push_back(ofVec3f(0,0,0));
     }
-    
-    //    float t = (2 + ofGetElapsedTimef()) * .1;
-    //    agent.x = ofSignedNoise(t, 0, 0);
-    //    agent.y = ofSignedNoise(0, t, 0);
-    //    agent.z = ofSignedNoise(0, 0, t);
-    //    agent *= 400;
+
     
     for (unsigned int i=0; i<points.size(); i++) {
         speeds[i].y += yAxis*0.1;
@@ -299,14 +279,13 @@ void ofApp::update(){
     buffer.begin();
     drawFboTest();
     buffer.end();
-        
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::drawFboTest(){
     
     ofEnableAlphaBlending();
-    
     
     if (clearBuffer == true && bufferClearTime > 0) {
         bufferClearTime--;
@@ -315,14 +294,14 @@ void ofApp::drawFboTest(){
         }
     }
     
-    
     if (ofGetKeyPressed('c') || clearBuffer == true){
         ofClear(255,255,255,0);
     }
     
+    
     for (int i=0; i<kNumCameras; i++) {
 //        if (lookatIndex[i] >= 0) {
-            cam[i].lookAt(testNodes[lookatIndex[i]]);
+        cam[i].lookAt(testNodes[lookatIndex[i]]);
 //        }
     }
     
@@ -332,9 +311,6 @@ void ofApp::drawFboTest(){
     ofRotateX(180);
     
     // objects
-//    ofRotateX(ofGetElapsedTimef());
-//    ofRotateY(ofGetElapsedTimef());
-//    ofRotateZ(ofGetElapsedTimef());
     v[0].draw(0, 0, 0);
     v[1].draw(1000, 0, 1200);
     
@@ -345,7 +321,6 @@ void ofApp::drawFboTest(){
     particles.draw(GL_POINTS, 0, (int)points.size());
     
     cam[camToView].end();
-    
     
 }
 
@@ -361,11 +336,13 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    
     if (key == '0') {
         camToView = 0;
     }else if (key == '1'){
         camToView = 1;
     }
+    
 }
 
 //--------------------------------------------------------------
