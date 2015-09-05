@@ -1,11 +1,6 @@
 #include "ofApp.h"
 
-int xAxis;
-int yAxis;
-int zAxis;
-int xRange;
-int yRange;
-int zRange;
+int xRange, yRange, zRange;
 bool xFlag, yFlag, zFlag;
 int timer;
 bool overdose;
@@ -48,9 +43,13 @@ void ofApp::setup(){
 
     lookatIndex = 1;
     parentIndex = 0;
-    camToView = 0;
+//    camToView = 0;
     
-    cam.setPosition(300, 50, -800);
+    
+    posX = 300;
+    posY = 50;
+    posZ = -800;
+    cam.setPosition(posX, posY, posZ);
     cam.setParent(testControllers[parentIndex]);
 
 	
@@ -75,26 +74,79 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
-    
-	float freqMult = 1;
+//	float freqMult = 1;
 	float amp = 30;
 	float scale = 1;
 	
 
     for(int i=0; i<2; i++) {
-		testControllers[i].setPosition(ofVec3f(sin(ofGetElapsedTimef() * freqMult) * amp, cos(ofGetElapsedTimef() * freqMult) * amp, sin(ofGetElapsedTimef() * freqMult * 0.7) * amp));
+		testControllers[i].setPosition(ofVec3f(sin(ofGetElapsedTimef() * 0.1),
+                                               cos(ofGetElapsedTimef() * 0.1),
+                                               sin(ofGetElapsedTimef() * 0.1)));
+		testControllers[i].setOrientation(ofVec3f(sin(ofGetElapsedTimef() * 0.2),
+                                                  cos(ofGetElapsedTimef() * 0.2),
+                                                  sin(ofGetElapsedTimef() * 0.1) ));
 		
-		testControllers[i].setOrientation(ofVec3f(sin(ofGetElapsedTimef() * freqMult * 0.2) * amp * 5, cos(ofGetElapsedTimef() * freqMult * 0.2) * amp * 5, sin(ofGetElapsedTimef() * freqMult * 0.2 * 0.7) * amp * 5));
-		
-		freqMult *= 3;
+//		freqMult *= 3;
 		amp *= 0.8;
 		scale *= 0.8;
 	}
     
     
+    //  cameras
     if(lookatIndex >= 0){
         cam.lookAt(testNodes[lookatIndex]);
     }
+
+    
+    if (xFlag == false) {
+        if (cam.getGlobalPosition().x < -700) {
+            xFlag = true;
+            switchLookat();
+        }
+    }else if (xFlag == true) {
+        if (cam.getGlobalPosition().x > 700) {
+            xFlag = false;
+            switchLookat();
+        }
+    }
+    
+    if (yFlag == false) {
+        if (cam.getGlobalPosition().y < -200) {
+            yFlag = true;
+            switchLookat();
+        }
+    }else if (yFlag == true) {
+        if (cam.getGlobalPosition().y > 200) {
+            yFlag = false;
+            switchLookat();
+        }
+    }
+    
+    if (zFlag == false) {
+        if (cam.getGlobalPosition().z < -700) {
+            zFlag = true;
+            switchLookat();
+        }
+    }else if (zFlag == true) {
+        if (cam.getGlobalPosition().z > 700) {
+            zFlag = false;
+            switchLookat();
+        }
+    }
+    
+    
+    if (((int)cam.getGlobalPosition().x > -110 && (int)cam.getGlobalPosition().x < -90) ||
+        ((int)cam.getGlobalPosition().x > 90  && (int)cam.getGlobalPosition().x < 110)){
+        clearBuffer = true;
+        if (clearBuffer) {
+            bufferClearTime = 50;
+        }
+    }
+    
+
+    cam.setPosition(posX, posY, posZ);
+    posZ +=5;
     
     
     // lighting
@@ -153,13 +205,13 @@ void ofApp::update(){
     
     // particles
     if(points.size() < 500000) {
-        points.push_back(ofVec3f(ofRandom(-2000, 2000),ofRandom(-10, 200),ofRandom(-2000, 2000)));
-        speeds.push_back(ofVec3f(0,0,0));
+        points.push_back(ofVec3f(ofRandom(-2000, 2000),ofRandom(-200, 200),ofRandom(-2000, 2000)));
+        speeds.push_back(ofVec3f(ofRandom(-1,1),ofRandom(-1,1),ofRandom(-1,1)));
     }
     
     
     for (unsigned int i=0; i<points.size(); i++) {
-        speeds[i].y += yAxis*0.1;
+        speeds[i].y += yRange * 0.001;
         points[i]   += speeds[i];
         speeds[i]   *= 0.98;
         
@@ -171,8 +223,8 @@ void ofApp::update(){
         
         if(points[i].x > xRange*10)    points[i].x = xRange*-10;
         if(points[i].x < xRange*-10)   points[i].x = xRange*10;
-        if(points[i].y > yRange)       points[i].y = yRange*-0.1;
-        if(points[i].y < yRange*-0.1)  points[i].y = yRange;
+        if(points[i].y > yRange)    points[i].y = yRange*-1;
+        if(points[i].y < yRange*-1)   points[i].y = yRange;
         if(points[i].z > zRange*10)    points[i].z = zRange*-10;
         if(points[i].z < zRange*-10)   points[i].z = zRange*10;
     }
@@ -181,7 +233,7 @@ void ofApp::update(){
     buffer.begin();
     drawFboTest();
     buffer.end();
-
+    
 }
 
 //--------------------------------------------------------------
@@ -240,13 +292,36 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
+void ofApp::switchLookat(){
+    
+    overdose = true;
+    
+//    lookatIndex++ ;
+//    if(lookatIndex >= kNumNodes) {
+//        lookatIndex = 0;
+//    }
+
+/*
+     switch (lookatIndex) {
+        case 0:
+            lookatIndex = 1;
+            break;
+        case 1:
+            lookatIndex = 0;
+            break;
+    }
+ */
+    
+}
+
+//--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	
 	switch(key) {
 			
-		case 'v':
-			camToView = 1 - camToView;
-			break;
+//		case 'v':
+//			camToView = 1 - camToView;
+//			break;
 			
 		case 't':
 			lookatIndex++ ;
@@ -261,7 +336,6 @@ void ofApp::keyPressed(int key){
 				parentIndex = 0;
             }
             cam.setParent(testControllers[parentIndex]);
-
 
 			break;
 			

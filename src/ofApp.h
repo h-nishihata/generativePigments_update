@@ -16,6 +16,7 @@ public:
     void draw();
     
     void drawFboTest();
+    void switchLookat();
     
     void keyPressed (int key);
     void keyReleased(int key);
@@ -37,7 +38,7 @@ public:
     
     int lookatIndex;
     int parentIndex;
-    int camToView;
+//    int camToView;    // For multiple cameras
     
     
     float r = 218;
@@ -57,4 +58,6 @@ public:
     ofVbo particles;
     vector<ofVec3f>points;
     vector<ofVec3f>speeds;
+    
+    int posX, posY, posZ;
 };
