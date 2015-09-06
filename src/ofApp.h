@@ -5,9 +5,9 @@
 
 #define kNumObjs 2
 #define kNumNodes 2
-#define kNumControllers 2
+#define kNumControllers 1
 #define kNumCameras 2
-#define kNumLights 3
+#define kNumLights 2
 
 class ofApp : public ofBaseApp{
 public:
@@ -36,6 +36,16 @@ public:
     ofCamera cam;
     
     
+    ofFbo buffer;
+    vbo v[kNumObjs];
+    
+    
+    ofVbo particles;
+    vector<ofVec3f>points;
+    vector<ofVec3f>speeds;
+    
+    
+    int posX, posY, posZ;
     int lookatIndex;
     int parentIndex;
 //    int camToView;    // For multiple cameras
@@ -48,16 +58,6 @@ public:
     
     
     bool clearBuffer;
-    int bufferClearTime;
-    
-    
-    ofFbo buffer;
-    vbo v[kNumObjs];
-    
-    
-    ofVbo particles;
-    vector<ofVec3f>points;
-    vector<ofVec3f>speeds;
-    
-    int posX, posY, posZ;
+    int bufferClearTime = 50;
+        
 };

@@ -5,10 +5,9 @@
 
 #define kNumImgs 4
 
-extern int xRange;
-extern int yRange;
-extern int zRange;
-extern int timer;
+extern int xValue;
+extern int yValue;
+extern int zValue;
 extern bool overdose;
 
 class vbo{
@@ -19,19 +18,23 @@ public:
     void draw(float x, float y, float z);
     
     void setID(int indentify);
-    void reset();
+    void resetImg();
+    void resetVerts();
     
     int ID;
     static int sum;
     int x,y;
+    int timer;
+    int lastingTime = 3000;
+
+    unsigned char * pixels;
     
     static const int WIDTH = 512;
     static const int HEIGHT = 512;
     static const int NUM_PARTICLES = WIDTH * HEIGHT;
-
-    unsigned char * pixels;
     
-        float vecLength[NUM_PARTICLES];
+    float vecLength[NUM_PARTICLES];
+
     
     ofImage image;
     
@@ -40,8 +43,6 @@ public:
     ofFloatColor myColor[NUM_PARTICLES];
     
     ofVec3f vec[NUM_PARTICLES];
-
-
     
 };
 #endif
