@@ -21,8 +21,8 @@ void ofApp::setup(){
     
     
     // lights
-    light[0].setPosition(0, 50, 0);
-    light[1].setPosition(1000, 50, 1200);
+    light[0].setPosition(0, 20, 0);
+    light[1].setPosition(1000, 20, 1200);
     
 	for(int i = 0; i < kNumLights; i++) {
 		light[i].enable();
@@ -44,9 +44,9 @@ void ofApp::setup(){
 //    camToView = 0;
     
     
-    posX = 300;
-    posY = 50;
-    posZ = -800;
+    posX = 800;
+    posY = 0;
+    posZ = 1000;
     cam.setPosition(posX, posY, posZ);
     cam.setParent(testControllers[parentIndex]);
 
@@ -72,16 +72,14 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
-	float amp = 150;
 
     for(int i=0; i<kNumControllers; i++) {
-		testControllers[i].setPosition(ofVec3f(sin(ofGetElapsedTimef()),
-                                               cos(ofGetElapsedTimef()),
-                                               sin(ofGetElapsedTimef())));
-		testControllers[i].setOrientation(ofVec3f(sin(ofGetElapsedTimef()*0.2)*amp,
-                                                  cos(ofGetElapsedTimef()*0.2)*amp,
-                                                  sin(ofGetElapsedTimef()*0.15)*amp));
-		amp *= 0.8;
+		testControllers[i].setPosition(ofVec3f(sin(ofGetElapsedTimef()*0.1),
+                                               cos(ofGetElapsedTimef()*0.1),
+                                               sin(ofGetElapsedTimef()*0.1)));
+		testControllers[i].setOrientation(ofVec3f(sin(ofGetElapsedTimef()*0.1)*xValue/2,
+                                                  cos(ofGetElapsedTimef()*0.1)*yValue/2,
+                                                  sin(ofGetElapsedTimef()*0.2)*zValue/2));
 	}
     
     
@@ -92,18 +90,19 @@ void ofApp::update(){
 
     
     if (zFlag == false) {
-        posZ -= zValue/500;
-        if (cam.getGlobalPosition().z < -700) {
+        posZ -= zValue/20;
+        if (cam.getGlobalPosition().z > 1200) {
             zFlag = true;
             switchLookat();
         }
     }else if (zFlag == true) {
-        posZ += zValue/500;
-        if (cam.getGlobalPosition().z > 700) {
+        posZ += zValue/20;
+        if (cam.getGlobalPosition().z < 0) {
             zFlag = false;
             switchLookat();
         }
     }
+    
     cam.setPosition(posX, posY, posZ);
     
 

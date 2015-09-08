@@ -45,6 +45,16 @@ void vbo::resetImg(){
 //--------------------------------------------------------------
 void vbo::resetVerts(){
     
+    for (int i=0; i<WIDTH; i++) {
+        for (int j=0; j<HEIGHT; j++) {
+            myVerts[j * WIDTH + i].set(i - WIDTH/2, j - HEIGHT/2, 10000);
+            myColor[j * WIDTH + i].set(0.0, 0.0, 0.0);
+        }
+    }
+    
+    myVbo.setVertexData(myVerts, NUM_PARTICLES, GL_DYNAMIC_DRAW);
+    myVbo.setColorData(myColor, NUM_PARTICLES, GL_DYNAMIC_DRAW);
+    
     pixels = image.getPixels();
     
     
@@ -63,9 +73,8 @@ void vbo::resetVerts(){
             float brightness = (invertR+invertG+invertB) / 3.0f;
             
             
-            if (pixels[j * WIDTH*3 + i * 3] != 255 &&
-                pixels[j * WIDTH*3 + i * 3+1] != 255 &&
-                pixels[j * WIDTH*3 + i * 3+2] != 255) {
+            if (pixels[j * WIDTH*3 + i * 3] < 170 ||
+                pixels[j * WIDTH*3 + i * 3+2] > 100) {
                 myVerts[j * WIDTH + i] = ofVec3f(i - WIDTH/2,
                                                  j - HEIGHT/2,
                                                  brightness * 256.0);

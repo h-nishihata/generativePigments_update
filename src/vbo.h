@@ -3,7 +3,7 @@
 
 #include "ofMain.h"
 
-#define kNumImgs 4
+#define kNumImgs 5
 
 extern int xValue;
 extern int yValue;
