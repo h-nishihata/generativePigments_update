@@ -44,17 +44,22 @@ void ofApp::setup(){
 //    camToView = 0;
     
     
-    posX = 800;
-    posY = 0;
-    posZ = 1000;
-    cam.setPosition(posX, posY, posZ);
+    camPosX = 500;
+    camPosY = 0;
+    camPosZ = 600;
+    cam.setPosition(camPosX, camPosY, camPosZ);
     cam.setParent(testControllers[parentIndex]);
 
 	
     
     // nodes
-    testNodes[0].setPosition(0, 0, 0);
-    testNodes[1].setPosition(1000, 0, 1200);
+    objPosX_0 = objPosY_0 = objPosZ_0 = 0;
+    objPosX_1 = 1000;
+    objPosY_1 = 0;
+    objPosZ_1 = 1200;
+    
+    testNodes[0].setPosition(objPosX_0, objPosY_0, objPosZ_0);
+    testNodes[1].setPosition(objPosX_1, objPosY_1, objPosZ_1);
 
 	for(int i=0; i<kNumControllers; i++) {
 		if(i>0) testControllers[i].setParent(testControllers[i-1]);
@@ -77,9 +82,9 @@ void ofApp::update(){
 		testControllers[i].setPosition(ofVec3f(sin(ofGetElapsedTimef()*0.1),
                                                cos(ofGetElapsedTimef()*0.1),
                                                sin(ofGetElapsedTimef()*0.1)));
-		testControllers[i].setOrientation(ofVec3f(sin(ofGetElapsedTimef()*0.1)*xValue/2,
-                                                  cos(ofGetElapsedTimef()*0.1)*yValue/2,
-                                                  sin(ofGetElapsedTimef()*0.2)*zValue/2));
+		testControllers[i].setOrientation(ofVec3f(sin(ofGetElapsedTimef()*0.2)*xValue/2,
+                                                  cos(ofGetElapsedTimef()*0.2)*yValue/2,
+                                                  sin(ofGetElapsedTimef()*0.4)*zValue/2));
 	}
     
     
@@ -90,32 +95,46 @@ void ofApp::update(){
 
     
     if (zFlag == false) {
-        posZ -= zValue/20;
-        if (cam.getGlobalPosition().z > 1200) {
+        camPosZ -= zValue/100;
+        if (cam.getGlobalPosition().z > objPosZ_1 + 100) {
             zFlag = true;
             switchLookat();
         }
     }else if (zFlag == true) {
-        posZ += zValue/20;
-        if (cam.getGlobalPosition().z < 0) {
+        camPosZ += zValue/100;
+        if (cam.getGlobalPosition().z < objPosZ_0 + 100) {
             zFlag = false;
             switchLookat();
         }
     }
     
-    cam.setPosition(posX, posY, posZ);
+    cam.setPosition(camPosX, camPosY, camPosZ);
     
 
     if (testControllers[0].getRoll() > -10 && testControllers[0].getRoll() < 10){
         clearBuffer = true;
     }
     
-    if(testControllers[0].getPitch() == 0 || testControllers[0].getPitch() == (int)abs(100)){
+    if(testControllers[0].getPitch() >= 80 && testControllers[0].getPitch() <= 100){
         overdose = false;
-    }else{
-        overdose = true;
     }
-
+    
+    if(testControllers[0].getHeading() == (int)abs(50)){
+        if(!waiting){
+            switchLookat();
+            waiting = true;
+        }
+    }
+    
+    if(waiting){
+        if(step < 10){
+            step++;
+        }else{
+            waiting = false;
+            step = 0;
+        }
+    }
+    
     
     // lighting
     if (rFlag == false) {
@@ -189,12 +208,12 @@ void ofApp::update(){
 //            speeds[i] -= vec;
 //        }
 
-        if(points[i].x > xValue*10)    points[i].x = xValue*-10;
-        if(points[i].x < xValue*-10)   points[i].x = xValue*10;
-        if(points[i].y > yValue*5)       points[i].y = yValue*-5;
-        if(points[i].y < yValue*-5)    points[i].y = yValue*5;
-        if(points[i].z > zValue*10)    points[i].z = zValue*-10;
-        if(points[i].z < zValue*-10)   points[i].z = zValue*10;
+        if(points[i].x > xValue*20)    points[i].x * -1;
+        if(points[i].x < xValue*-20)   points[i].x * -1;
+        if(points[i].y > yValue*20)     points[i].y * -1;
+        if(points[i].y < yValue*-20)    points[i].y * -1;
+        if(points[i].z > zValue*20)    points[i].z * -1;
+        if(points[i].z < zValue*-20)   points[i].z * -1;
     }
     
     
@@ -224,7 +243,7 @@ void ofApp::drawFboTest(){
     
     cam.begin();
     
-        /* debug
+        /*
         ofSetColor(255, 0, 0);
         testNodes[0].setScale(5);
         testNodes[0].draw();
@@ -236,8 +255,8 @@ void ofApp::drawFboTest(){
     
     
         // objects
-        v[0].draw(0, 0, 0);
-        v[1].draw(1000, 0, 1200);
+        v[0].draw(objPosX_0, objPosY_0, objPosZ_0);
+        v[1].draw(objPosX_1, objPosY_1, objPosZ_1);
     
         
         // particles

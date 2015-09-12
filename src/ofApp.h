@@ -9,6 +9,7 @@
 #define kNumCameras 2
 #define kNumLights 2
 
+
 class ofApp : public ofBaseApp{
 public:
     void setup();
@@ -45,11 +46,15 @@ public:
     vector<ofVec3f>speeds;
     
     
-    int posX, posY, posZ;
+    float camPosX, camPosY, camPosZ;
+    int objPosX_0, objPosY_0, objPosZ_0;
+    int objPosX_1, objPosY_1, objPosZ_1;
     int lookatIndex;
     int parentIndex;
 //    int camToView;    // For multiple cameras
     
+    bool waiting;
+    int step;
     
     float r = 218;
     float g = 165;

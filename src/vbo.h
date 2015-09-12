@@ -10,12 +10,13 @@ extern int yValue;
 extern int zValue;
 extern bool overdose;
 
+
 class vbo{
 public:
 
     void setup();
     void update();
-    void draw(float x, float y, float z);
+    void draw(int x, int y, int z);
     
     void setID(int indentify);
     void resetImg();
@@ -34,7 +35,9 @@ public:
     static const int NUM_PARTICLES = WIDTH * HEIGHT;
     
     float vecLength[NUM_PARTICLES];
-
+    float tempMax;
+    int longestVec;
+    float initialLength;
     
     ofImage image;
     

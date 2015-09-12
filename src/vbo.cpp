@@ -37,7 +37,6 @@ void vbo::resetImg(){
         
     }
 
-//    cout << str << "\n";
     image.loadImage(str);
     
 }
@@ -45,19 +44,21 @@ void vbo::resetImg(){
 //--------------------------------------------------------------
 void vbo::resetVerts(){
     
+    overdose = true;
+    int centerZ;
+    
     for (int i=0; i<WIDTH; i++) {
         for (int j=0; j<HEIGHT; j++) {
             myVerts[j * WIDTH + i].set(i - WIDTH/2, j - HEIGHT/2, 10000);
             myColor[j * WIDTH + i].set(0.0, 0.0, 0.0);
         }
     }
-    
+
     myVbo.setVertexData(myVerts, NUM_PARTICLES, GL_DYNAMIC_DRAW);
     myVbo.setColorData(myColor, NUM_PARTICLES, GL_DYNAMIC_DRAW);
     
     pixels = image.getPixels();
-    
-    
+   
     for (int i=0; i<WIDTH; i++) {
         for (int j=0; j<HEIGHT; j++) {
             
@@ -80,19 +81,22 @@ void vbo::resetVerts(){
                                                  brightness * 256.0);
                 myColor[j * WIDTH + i] = ofFloatColor(invertR, invertG, invertB, 1.0);
                 
-                vec[j*WIDTH+i] = myVerts[j * WIDTH + i] - myVerts[HEIGHT/2 * WIDTH + WIDTH/2];
-                //　速度ベクトル　＝　位置ベクトルB（末端）　ー　位置ベクトルA（中心）
+                vec[j*WIDTH+i] = myVerts[j*WIDTH+i] - ofVec3f(0,0,0);
                 
                 vecLength[j*WIDTH+i] = vec[j*WIDTH+i].length();
+                if(vecLength[j*WIDTH+i] > tempMax){
+                    tempMax = vecLength[j*WIDTH+i];
+                    longestVec = j*WIDTH+i;
+                }
             }
             
         }
     }
-    
+
+    initialLength = vecLength[longestVec];
+
     myVbo.setVertexData(myVerts, NUM_PARTICLES, GL_DYNAMIC_DRAW);
     myVbo.setColorData(myColor, NUM_PARTICLES, GL_DYNAMIC_DRAW);
-    
-    overdose = true;
     
 }
 
@@ -150,24 +154,31 @@ void vbo::update(){
     
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
-//                myVerts[j * WIDTH + i].x += (vec[j*WIDTH+i].x * vecLength[j*WIDTH+i] * 0.0001);
-                myVerts[j * WIDTH + i].y += (vec[j*WIDTH+i].y * vecLength[j*WIDTH+i]/10000);
-                myVerts[j * WIDTH + i].z += (vec[j*WIDTH+i].z * vecLength[j*WIDTH+i]/10000);
+
+                myVerts[j*WIDTH+i].x += (vec[j*WIDTH+i].x * vecLength[j*WIDTH+i]/10000);
+                myVerts[j*WIDTH+i].y += (vec[j*WIDTH+i].y * vecLength[j*WIDTH+i]/10000);
+                myVerts[j*WIDTH+i].z += (vec[j*WIDTH+i].z * vecLength[j*WIDTH+i]/10000);
+                
+                if(vecLength[j*WIDTH+i] < 200){
+                    vec[j*WIDTH+i].normalize();
+                }
 
             }
         }
+
+        vec[longestVec] = myVerts[longestVec] - ofVec3f(0,0,0);
+        if(vec[longestVec].length() > initialLength * 150){
+            resetVerts();
+        }
         
-    }else{
-        resetVerts();
     }
 
-    
     myVbo.updateVertexData(myVerts, NUM_PARTICLES);
 
 }
 
 //--------------------------------------------------------------
-void vbo::draw(float posX, float posY, float posZ){
+void vbo::draw(int posX, int posY, int posZ){
     
     glTranslatef(posX, posY, posZ);
     myVbo.draw(GL_POINTS, 0, NUM_PARTICLES);
