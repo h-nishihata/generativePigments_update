@@ -21,17 +21,13 @@ void ofApp::setup(){
     
     
     // lights
-    light[0].setPosition(0, 20, 0);
-    light[1].setPosition(1000, 20, 1200);
+    light[0].setPosition(0,0,0);
+    light[1].setPosition(1000,0,1200);
     
 	for(int i = 0; i < kNumLights; i++) {
 		light[i].enable();
         light[i].setSpotlight();
         light[i].lookAt(testNodes[lookatIndex]);
-        
-        light[i].setAmbientColor(ofColor(r, g, b, 255));
-        light[i].setDiffuseColor(ofColor(r+13, g+24, b+12));
-        light[i].setSpecularColor(ofColor(255, 255, 255));
 	}
 	
     
@@ -44,9 +40,9 @@ void ofApp::setup(){
 //    camToView = 0;
     
     
-    camPosX = 500;
+    camPosX = 250;
     camPosY = 0;
-    camPosZ = 600;
+    camPosZ = 350;
     cam.setPosition(camPosX, camPosY, camPosZ);
     cam.setParent(testControllers[parentIndex]);
 
@@ -54,9 +50,9 @@ void ofApp::setup(){
     
     // nodes
     objPosX_0 = objPosY_0 = objPosZ_0 = 0;
-    objPosX_1 = 1000;
+    objPosX_1 = 500;
     objPosY_1 = 0;
-    objPosZ_1 = 1200;
+    objPosZ_1 = 700;
     
     testNodes[0].setPosition(objPosX_0, objPosY_0, objPosZ_0);
     testNodes[1].setPosition(objPosX_1, objPosY_1, objPosZ_1);
@@ -82,6 +78,7 @@ void ofApp::update(){
 		testControllers[i].setPosition(ofVec3f(sin(ofGetElapsedTimef()*0.1),
                                                cos(ofGetElapsedTimef()*0.1),
                                                sin(ofGetElapsedTimef()*0.1)));
+        
 		testControllers[i].setOrientation(ofVec3f(sin(ofGetElapsedTimef()*0.2)*xValue/2,
                                                   cos(ofGetElapsedTimef()*0.2)*yValue/2,
                                                   sin(ofGetElapsedTimef()*0.4)*zValue/2));
@@ -96,15 +93,13 @@ void ofApp::update(){
     
     if (zFlag == false) {
         camPosZ -= zValue/100;
-        if (cam.getGlobalPosition().z > objPosZ_1 + 100) {
+        if (cam.getGlobalPosition().z > objPosZ_1-100) {
             zFlag = true;
-            switchLookat();
         }
     }else if (zFlag == true) {
         camPosZ += zValue/100;
-        if (cam.getGlobalPosition().z < objPosZ_0 + 100) {
+        if (cam.getGlobalPosition().z < objPosZ_0+100) {
             zFlag = false;
-            switchLookat();
         }
     }
     
@@ -113,13 +108,16 @@ void ofApp::update(){
 
     if (testControllers[0].getRoll() > -10 && testControllers[0].getRoll() < 10){
         clearBuffer = true;
+        bufferClearTime = abs(testControllers[0].getRoll() * 6);
     }
     
-    if(testControllers[0].getPitch() >= 80 && testControllers[0].getPitch() <= 100){
+    if(testControllers[0].getPitch() >= 90 && testControllers[0].getPitch() <= 100){
         overdose = false;
     }
     
-    if(testControllers[0].getHeading() == (int)abs(50)){
+    if((testControllers[0].getHeading() >= 0 && testControllers[0].getHeading() <= (int)abs(5))  ||
+       (testControllers[0].getHeading() >= (int)abs(15) && testControllers[0].getHeading() <= (int)abs(20)) ||
+       (testControllers[0].getHeading() >= (int)abs(95) && testControllers[0].getHeading() <= (int)abs(100))){
         if(!waiting){
             switchLookat();
             waiting = true;
@@ -127,7 +125,7 @@ void ofApp::update(){
     }
     
     if(waiting){
-        if(step < 10){
+        if(step < 100){
             step++;
         }else{
             waiting = false;
@@ -143,10 +141,10 @@ void ofApp::update(){
             rFlag = true;
         }
     }else if (rFlag == true) {
-        if (g > 80 && b < 80) {
+        if (b < 80) {
             r +=0.1;
         }
-        if (r >= 255) {
+        if (r >= 180) {
             rFlag = false;
         }
     }
@@ -169,10 +167,10 @@ void ofApp::update(){
             bFlag = true;
         }
     }else if (bFlag == true) {
-        if (r < 80 && g > 80) {
+        if (r < 80 && g < 80) {
             b +=0.1;
         }
-        if (b >= 190) {
+        if (b >= 220) {
             bFlag = false;
         }
     }
@@ -191,29 +189,21 @@ void ofApp::update(){
     
     
     // particles
-    if(points.size() < 10000) {
-        points.push_back(ofVec3f(ofRandom(-2000, 2000),ofRandom(-200, 200),ofRandom(-2000, 2000)));
-        speeds.push_back(ofVec3f(ofRandom(-1,1),ofRandom(-1,1),ofRandom(-1,1)));
+    if(points.size() < 50000) {
+        points.push_back(ofVec3f(ofRandom(-5000, 5000),ofRandom(-2000, 2000),ofRandom(-5000, 5000)));
     }
     
     
     for (unsigned int i=0; i<points.size(); i++) {
-//        speeds[i].y += yValue * 0.001;
-        points[i]   += speeds[i];
-        speeds[i]   *= 0.98;
-        
-//        ofVec3f vec = v[0].myVerts[0] - points[i];
-//        if(vec.length() < 100) {
-//            vec.normalize();
-//            speeds[i] -= vec;
-//        }
 
-        if(points[i].x > xValue*20)    points[i].x * -1;
-        if(points[i].x < xValue*-20)   points[i].x * -1;
-        if(points[i].y > yValue*20)     points[i].y * -1;
-        if(points[i].y < yValue*-20)    points[i].y * -1;
-        if(points[i].z > zValue*20)    points[i].z * -1;
-        if(points[i].z < zValue*-20)   points[i].z * -1;
+        float t = ofGetElapsedTimef() * 0.9f;
+        ofVec3f pos(ofSignedNoise(t, points[i].y, points[i].z),
+                    ofSignedNoise(points[i].x, t, points[i].z),
+                    ofSignedNoise(points[i].x, points[i].y, t));
+        
+        pos *= 10 * ofGetLastFrameTime();
+        points[i]   += pos;
+
     }
     
     
@@ -232,7 +222,6 @@ void ofApp::drawFboTest(){
         bufferClearTime--;
         if (bufferClearTime <= 0){
             clearBuffer = false;
-            bufferClearTime = 50;
         }
     }
     

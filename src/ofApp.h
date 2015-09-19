@@ -43,7 +43,6 @@ public:
     
     ofVbo particles;
     vector<ofVec3f>points;
-    vector<ofVec3f>speeds;
     
     
     float camPosX, camPosY, camPosZ;
@@ -63,6 +62,6 @@ public:
     
     
     bool clearBuffer;
-    int bufferClearTime = 50;
+    int bufferClearTime;
         
 };

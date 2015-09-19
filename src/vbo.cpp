@@ -110,7 +110,7 @@ void vbo::setup(){
     
     resetImg();
     resetVerts();
-
+    
 }
 
 //--------------------------------------------------------------
@@ -157,9 +157,9 @@ void vbo::update(){
 
                 myVerts[j*WIDTH+i].x += (vec[j*WIDTH+i].x * vecLength[j*WIDTH+i]/10000);
                 myVerts[j*WIDTH+i].y += (vec[j*WIDTH+i].y * vecLength[j*WIDTH+i]/10000);
-                myVerts[j*WIDTH+i].z += (vec[j*WIDTH+i].z * vecLength[j*WIDTH+i]/10000);
+                myVerts[j*WIDTH+i].z += (vec[j*WIDTH+i].z * vecLength[j*WIDTH+i]/20000);
                 
-                if(vecLength[j*WIDTH+i] < 200){
+                if(vecLength[j*WIDTH+i] > 100){
                     vec[j*WIDTH+i].normalize();
                 }
 
@@ -167,7 +167,7 @@ void vbo::update(){
         }
 
         vec[longestVec] = myVerts[longestVec] - ofVec3f(0,0,0);
-        if(vec[longestVec].length() > initialLength * 150){
+        if(vec[longestVec].length() > initialLength * 200){
             resetVerts();
         }
         
