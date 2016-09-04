@@ -1,1 +1,1 @@
-# generative_pigments_update
+# generativePigments_update
